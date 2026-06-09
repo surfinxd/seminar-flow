@@ -5,3 +5,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - postgresql.yaml
+
+configurations:
+  - kustomizeconfig.yaml
+
