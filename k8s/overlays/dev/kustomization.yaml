@@ -10,4 +10,4 @@ namePrefix: dev-
 images:
 - name: seminar-flow
   newName: asia-northeast3-docker.pkg.dev/seminar-flow-2606/seminar-flow/seminar-flow
-  newTag: 7be6124b1034c73b807d5efdc7185ffccc1b0304
+  newTag: 5e329d86205ad9184ac03ecc7e32d765e94bb8e5
