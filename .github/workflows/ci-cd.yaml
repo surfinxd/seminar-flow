@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  GCP_PROJECT_ID: seminar-flow-2026
+  GCP_PROJECT_ID: seminar-flow-2606
   GAR_LOCATION: asia-northeast3
   GAR_REPOSITORY: seminar-flow
   IMAGE_NAME: seminar-flow
