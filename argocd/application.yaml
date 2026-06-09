@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/my-org/seminar-flow.git'
+    repoURL: 'https://github.com/surfinxd/seminar-flow.git'
     path: k8s/overlays/dev
     targetRevision: HEAD
   destination:
