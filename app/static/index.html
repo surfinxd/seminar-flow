@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeminarFlow v1.0 Web App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.8s ease-out both;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 600;
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background-color: #475569;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .seminar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .seminar-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .seminar-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .seminar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .seminar-slots {
+            color: var(--success);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: none;
+            animation: slideIn 0.3s ease forwards;
+            z-index: 1000;
+        }
+
+        #auth-status {
+            color: var(--success);
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="hero-title">SeminarFlow Web</h1>
+            <p style="color: #94a3b8;">Discover, reserve, and manage your seminars.</p>
+        </div>
+
+        <!-- Login Panel -->
+        <div class="glass-panel" id="login-panel">
+            <h2>🔑 Login to Access Features</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required placeholder="e.g. user123">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <div id="auth-status">✅ Logged in successfully! You can now create and reserve seminars.</div>
+        </div>
+
+        <!-- Create Seminar Panel (Hidden until login) -->
+        <div class="glass-panel" id="create-panel" style="display: none; animation-delay: 0.1s;">
+            <h2>📝 Create New Seminar</h2>
+            <form id="create-form">
+                <div class="form-group">
+                    <label for="sem-title">Title</label>
+                    <input type="text" id="sem-title" required placeholder="e.g. FastAPI Masterclass">
+                </div>
+                <div class="form-group">
+                    <label for="sem-desc">Description</label>
+                    <input type="text" id="sem-desc" required placeholder="Short description of the seminar">
+                </div>
+                <div class="form-group">
+                    <label for="sem-slots">Total Slots</label>
+                    <input type="number" id="sem-slots" required min="1" placeholder="e.g. 50">
+                </div>
+                <button type="submit" class="btn">Create Seminar</button>
+            </form>
+        </div>
+
+        <!-- Seminars Panel -->
+        <div class="glass-panel" style="animation-delay: 0.2s;">
+            <div class="flex-between">
+                <h2>📅 Available Seminars</h2>
+                <button onclick="fetchSeminars()" class="btn"
+                    style="width: auto; padding: 0.5rem 1rem; font-size: 0.9rem;">Refresh</button>
+            </div>
+
+            <div class="seminar-grid" id="seminar-list">
+                <!-- Seminars will be loaded here -->
+                <p style="color: #94a3b8; grid-column: 1/-1; text-align: center;">Loading seminars...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Message goes here</div>
+
+    <script>
+        let accessToken = null;
+
+        // UI Helpers
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            toast.style.borderLeftColor = isError ? 'var(--danger)' : 'var(--primary)';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        // Login Logic
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const formData = new URLSearchParams();
+            formData.append('username', username);
+            formData.append('password', password);
+
+            try {
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    accessToken = data.access_token;
+                    document.getElementById('login-form').style.display = 'none';
+                    document.getElementById('auth-status').style.display = 'block';
+                    document.getElementById('create-panel').style.display = 'block'; // Show create panel
+                    showToast('Login successful!');
+                    fetchSeminars();
+                } else {
+                    const err = await res.json();
+                    showToast(err.detail || 'Login failed', true);
+                }
+            } catch (error) {
+                showToast('Network error', true);
+            }
+        });
+
+        // Create Seminar Logic
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!accessToken) return;
+
+            const title = document.getElementById('sem-title').value;
+            const desc = document.getElementById('sem-desc').value;
+            const slots = parseInt(document.getElementById('sem-slots').value);
+
+            try {
+                const res = await fetch('/seminars', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        description: desc,
+                        max_capacity: slots
+                    })
+                });
+
+                if (res.ok) {
+                    showToast('Seminar created successfully! 🎉');
+                    document.getElementById('create-form').reset();
+                    fetchSeminars(); // Refresh list to show new seminar
+                } else {
+                    const err = await res.json();
+                    showToast(err.detail || 'Failed to create seminar', true);
+                }
+            } catch (error) {
+                showToast('Network error', true);
+            }
+        });
+
+        // Fetch Seminars Logic
+        async function fetchSeminars() {
+            try {
+                const res = await fetch('/seminars');
+                if (res.ok) {
+                    const seminars = await res.json();
+                    renderSeminars(seminars);
+                } else {
+                    showToast('Failed to fetch seminars', true);
+                }
+            } catch (error) {
+                showToast('Network error while fetching seminars', true);
+            }
+        }
+
+        // Render Seminars
+        function renderSeminars(seminars) {
+            const container = document.getElementById('seminar-list');
+            container.innerHTML = '';
+
+            if (seminars.length === 0) {
+                container.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center;">No seminars found.</p>';
+                return;
+            }
+
+            seminars.forEach(seminar => {
+                const card = document.createElement('div');
+                card.className = 'seminar-card';
+
+                card.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <div class="seminar-title">${seminar.title}</div>
+                        <div style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1rem;">${seminar.description || 'No description'}</div>
+                        <div class="seminar-slots">🎟️ Slots available: ${seminar.available_slots} / ${seminar.total_slots}</div>
+                    </div>
+                    <button class="btn" onclick="reserveSeminar(${seminar.id})" 
+                            ${!accessToken || seminar.available_slots === 0 ? 'disabled' : ''}>
+                        ${seminar.available_slots === 0 ? 'Sold Out' : (accessToken ? 'Reserve Now' : 'Login to Reserve')}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Reserve Seminar Logic
+        async function reserveSeminar(seminarId) {
+            if (!accessToken) {
+                showToast('Please login first', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(`/seminars/${seminarId}/reservations`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (res.ok) {
+                    showToast('Reservation successful! 🎉');
+                    fetchSeminars();
+                } else {
+                    const err = await res.json();
+                    showToast(err.detail || 'Reservation failed', true);
+                }
+            } catch (error) {
+                showToast('Network error', true);
+            }
+        }
+
+        // Initial fetch
+        fetchSeminars();
+    </script>
+</body>
+
+</html>

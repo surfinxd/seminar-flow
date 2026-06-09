@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - sealed-secret.yaml
+
+namePrefix: prod-
+
+replicas:
+  - name: seminar-flow-app
+    count: 3
+
+images:
+  - name: seminar-flow
+    newName: asia-northeast3-docker.pkg.dev/seminar-flow-project/seminar-flow/seminar-flow
+    newTag: stable
