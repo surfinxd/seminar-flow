@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
     # Shutdown
     engine.dispose()
 
-app = FastAPI(title="SeminarFlow v1.0", lifespan=lifespan)
+app = FastAPI(title="SeminarFlow v2.0", lifespan=lifespan)
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(seminars.router, prefix="/seminars", tags=["seminars"])
@@ -23,7 +23,7 @@ import os
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to SeminarFlow v1.0"}
+    return {"message": "Welcome to SeminarFlow v2.0"}
 
 @app.get("/web", response_class=HTMLResponse)
 def serve_web():
