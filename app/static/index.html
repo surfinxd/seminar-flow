@@ -237,20 +237,46 @@
             <p style="color: #94a3b8;">Discover, reserve, and manage your seminars.</p>
         </div>
 
-        <!-- Login Panel -->
+        <!-- Login / Signup Panel -->
         <div class="glass-panel" id="login-panel">
-            <h2>🔑 Login to Access Features</h2>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" required placeholder="e.g. user123">
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required placeholder="••••••••">
-                </div>
-                <button type="submit" class="btn">Login</button>
-            </form>
+            <!-- Login Form -->
+            <div id="login-section">
+                <h2>🔑 Login to Access Features</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" required placeholder="e.g. user123">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                </form>
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.95rem; color: #94a3b8; margin-bottom: 0;">
+                    Don't have an account? <a href="#" onclick="toggleAuthMode(true); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign up</a>
+                </p>
+            </div>
+
+            <!-- Signup Form (Hidden by default) -->
+            <div id="signup-section" style="display: none;">
+                <h2>👤 Create a New Account</h2>
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="signup-username">Username</label>
+                        <input type="text" id="signup-username" required placeholder="e.g. user123">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn">Sign Up</button>
+                </form>
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.95rem; color: #94a3b8; margin-bottom: 0;">
+                    Already have an account? <a href="#" onclick="toggleAuthMode(false); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;">Login</a>
+                </p>
+            </div>
+
             <div id="auth-status">✅ Logged in successfully! You can now create and reserve seminars.</div>
         </div>
 
@@ -303,6 +329,12 @@
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
+        // Toggle Auth View Mode
+        function toggleAuthMode(isSignup) {
+            document.getElementById('login-section').style.display = isSignup ? 'none' : 'block';
+            document.getElementById('signup-section').style.display = isSignup ? 'block' : 'none';
+        }
+
         // Login Logic
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -323,7 +355,8 @@
                 if (res.ok) {
                     const data = await res.json();
                     accessToken = data.access_token;
-                    document.getElementById('login-form').style.display = 'none';
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('signup-section').style.display = 'none';
                     document.getElementById('auth-status').style.display = 'block';
                     document.getElementById('create-panel').style.display = 'block'; // Show create panel
                     showToast('Login successful!');
@@ -331,6 +364,36 @@
                 } else {
                     const err = await res.json();
                     showToast(err.detail || 'Login failed', true);
+                }
+            } catch (error) {
+                showToast('Network error', true);
+            }
+        });
+
+        // Signup Logic
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('signup-username').value;
+            const password = document.getElementById('signup-password').value;
+
+            try {
+                const res = await fetch('/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                if (res.ok) {
+                    showToast('Registration successful! Please login. 🎉');
+                    toggleAuthMode(false); // Switch to login screen
+                    document.getElementById('username').value = username;
+                    document.getElementById('password').value = '';
+                } else {
+                    const err = await res.json();
+                    showToast(err.detail || 'Registration failed', true);
                 }
             } catch (error) {
                 showToast('Network error', true);
