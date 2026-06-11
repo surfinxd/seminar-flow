@@ -6,6 +6,3 @@ resources:
   - service.yaml
   - postgresql.yaml
 
-configurations:
-  - kustomizeconfig.yaml
-

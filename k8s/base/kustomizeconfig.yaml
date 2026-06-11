@@ -1,7 +1,0 @@
-nameReference:
-- kind: SealedSecret
-  group: bitnami.com
-  version: v1alpha1
-  fieldSpecs:
-  - path: spec/template/spec/containers/env/valueFrom/secretKeyRef/name
-    kind: Deployment
