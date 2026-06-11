@@ -5,8 +5,6 @@ resources:
   - ../../base
   - sealed-secret.yaml
 
-namePrefix: prod-
-
 replicas:
   - name: seminar-flow-app
     count: 3
