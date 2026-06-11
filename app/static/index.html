@@ -462,6 +462,8 @@
             }
 
             seminars.forEach(seminar => {
+                const availableSlots = seminar.max_capacity - seminar.current_registered;
+                const totalSlots = seminar.max_capacity;
                 const card = document.createElement('div');
                 card.className = 'seminar-card';
 
@@ -469,11 +471,11 @@
                     <div style="flex-grow: 1;">
                         <div class="seminar-title">${seminar.title}</div>
                         <div style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1rem;">${seminar.description || 'No description'}</div>
-                        <div class="seminar-slots">🎟️ Slots available: ${seminar.available_slots} / ${seminar.total_slots}</div>
+                        <div class="seminar-slots">🎟️ Slots available: ${availableSlots} / ${totalSlots}</div>
                     </div>
                     <button class="btn" onclick="reserveSeminar(${seminar.id})" 
-                            ${!accessToken || seminar.available_slots === 0 ? 'disabled' : ''}>
-                        ${seminar.available_slots === 0 ? 'Sold Out' : (accessToken ? 'Reserve Now' : 'Login to Reserve')}
+                            ${!accessToken || availableSlots === 0 ? 'disabled' : ''}>
+                        ${availableSlots === 0 ? 'Sold Out' : (accessToken ? 'Reserve Now' : 'Login to Reserve')}
                     </button>
                 `;
                 container.appendChild(card);
