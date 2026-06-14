@@ -8,4 +8,4 @@ resources:
 images:
 - name: seminar-flow
   newName: asia-northeast3-docker.pkg.dev/seminar-flow-2606/seminar-flow/seminar-flow
-  newTag: de66d6c7ef6c9c9b2cc7b4733e35fdf31abb77ed
+  newTag: 7af1ed31c84308946e547a520ae665774af4abac
