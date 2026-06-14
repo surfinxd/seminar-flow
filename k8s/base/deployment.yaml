@@ -16,6 +16,10 @@ spec:
     metadata:
       labels:
         app: seminar-flow-app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
     spec:
       terminationGracePeriodSeconds: 30
       containers:

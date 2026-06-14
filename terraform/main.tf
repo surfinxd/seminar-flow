@@ -84,7 +84,7 @@ resource "google_container_node_pool" "gke_nodes" {
   name       = "seminar-flow-node-pool"
   location   = var.region
   cluster    = google_container_cluster.gke_cluster.name
-  node_count = 1
+  node_count = 2
 
   node_config {
     preemptible  = false

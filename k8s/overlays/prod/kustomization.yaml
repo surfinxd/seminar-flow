@@ -11,5 +11,5 @@ replicas:
 
 images:
   - name: seminar-flow
-    newName: asia-northeast3-docker.pkg.dev/seminar-flow-project/seminar-flow/seminar-flow
+    newName: asia-northeast3-docker.pkg.dev/seminar-flow-2606/seminar-flow/seminar-flow
     newTag: stable

@@ -34,7 +34,6 @@ jobs:
       run: |
         python -m pytest
 
-
   build-and-push:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

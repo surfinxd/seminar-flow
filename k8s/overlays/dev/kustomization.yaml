@@ -2,10 +2,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- ../../base
-- sealed-secret.yaml
+  - ../../base
+  - sealed-secret.yaml
 
 images:
-- name: seminar-flow
-  newName: asia-northeast3-docker.pkg.dev/seminar-flow-2606/seminar-flow/seminar-flow
-  newTag: dfe6ddd4c9d3c3c24722bbd5566f85dfc3454482
+  - name: seminar-flow
+    newName: asia-northeast3-docker.pkg.dev/seminar-flow-2606/seminar-flow/seminar-flow
+    newTag: dev

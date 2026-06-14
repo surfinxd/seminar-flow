@@ -3,6 +3,8 @@ from contextlib import asynccontextmanager
 from app.api.endpoints import auth, seminars, reservations
 from app.core.database import Base, engine
 
+from prometheus_fastapi_instrumentator import Instrumentator
+
 Base.metadata.create_all(bind=engine)
 
 @asynccontextmanager
@@ -12,7 +14,8 @@ async def lifespan(app: FastAPI):
     # Shutdown
     engine.dispose()
 
-app = FastAPI(title="SeminarFlow v2.0", lifespan=lifespan)
+app = FastAPI(title="SeminarFlow v3.0", lifespan=lifespan)
+Instrumentator().instrument(app).expose(app)
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(seminars.router, prefix="/seminars", tags=["seminars"])
@@ -23,7 +26,7 @@ import os
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to SeminarFlow v2.0"}
+    return {"message": "Welcome to SeminarFlow v1.0"}
 
 @app.get("/web", response_class=HTMLResponse)
 def serve_web():

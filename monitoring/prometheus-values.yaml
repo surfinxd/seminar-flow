@@ -1,0 +1,22 @@
+server:
+  global:
+    scrape_interval: 15s
+    evaluation_interval: 15s
+
+serverFiles:
+  alerting_rules.yml:
+    groups:
+      - name: seminar-alerts
+        rules:
+          - alert: ContainerCPUUsageHigh
+            expr: sum(rate(container_cpu_usage_seconds_total{container!="", namespace=~"dev|prod"}[5m])) by (namespace, pod) / sum(container_spec_cpu_quota{container!="", namespace=~"dev|prod"} / 100000) by (namespace, pod) * 100 > 80
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Container CPU usage is high"
+              description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has CPU usage > 80%."
+
+alertmanager:
+  enabled: true
+  configFile: /etc/alertmanager/alertmanager.yml

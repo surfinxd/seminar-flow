@@ -82,3 +82,9 @@ Thumbs.db
 
 # docs 
 docs/
+ADR.md
+AGENTS.md
+ARCHITECTURE.md
+
+# 로컬 전용 실배포 보안 파일
+alerts/env-secret-plain.yaml
