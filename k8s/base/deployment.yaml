@@ -32,6 +32,13 @@ spec:
               command: ["/bin/sh", "-c", "sleep 5"]
         ports:
         - containerPort: 8000
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
         env:
         - name: DATABASE_URL
           valueFrom:
