@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki-monitoring
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: loki-stack
+    repoURL: 'https://grafana.github.io/helm-charts'
+    targetRevision: 2.10.2
+    helm:
+      values: |
+        loki:
+          enabled: true
+          persistence:
+            enabled: true
+            size: 10Gi
+          config:
+            schema_config:
+              configs:
+                - from: 2020-10-24
+                  store: boltdb-shipper
+                  object_store: filesystem
+                  schema: v11
+                  index:
+                    prefix: index_
+                    period: 24h
+        promtail:
+          enabled: true
+          config:
+            lokiAddress: http://loki-monitoring:3100/loki/api/v1/push
+            snippets:
+              extraScrapeConfigs: |
+                - job_name: kubernetes-pods
+                  kubernetes_sd_configs:
+                    - role: pod
+                  relabel_configs:
+                    - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+                      action: keep
+                      regex: true
+                    - source_labels: [__meta_kubernetes_namespace]
+                      target_label: namespace
+                    - source_labels: [__meta_kubernetes_pod_name]
+                      target_label: pod
+                    - source_labels: [__meta_kubernetes_pod_container_name]
+                      target_label: container
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

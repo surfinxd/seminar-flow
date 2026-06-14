@@ -1,0 +1,77 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-monitoring
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: prometheus
+    repoURL: 'https://prometheus-community.github.io/helm-charts'
+    targetRevision: 25.21.0
+    helm:
+      values: |
+        server:
+          global:
+            scrape_interval: 15s
+            evaluation_interval: 15s
+        serverFiles:
+          alerting_rules.yml:
+            groups:
+              - name: seminar-alerts
+                rules:
+                  - alert: ContainerCPUUsageHigh
+                    expr: sum(rate(container_cpu_usage_seconds_total{container!="", namespace=~"dev|prod"}[5m])) by (namespace, pod) / sum(container_spec_cpu_quota{container!="", namespace=~"dev|prod"} / 100000) by (namespace, pod) * 100 > 80
+                    for: 2m
+                    labels:
+                      severity: critical
+                    annotations:
+                      summary: "Container CPU usage is high"
+                      description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has CPU usage > 80%."
+        alertmanager:
+          enabled: true
+          config:
+            route:
+              group_by: ['alertname', 'namespace']
+              group_wait: 30s
+              group_interval: 5m
+              repeat_interval: 12h
+              receiver: 'default-discord'
+              routes:
+                - match:
+                    namespace: dev
+                  receiver: 'dev-discord-alerts'
+                - match:
+                    namespace: prod
+                  receiver: 'prod-discord-alerts'
+            receivers:
+              - name: 'default-discord'
+                discord_configs:
+                  - webhook_url: '${DISCORD_DEFAULT_WEBHOOK_URL}'
+                    title: '[{{ .Status | toUpper }}] 공통 시스템 경고'
+                    message: '장애 알림이 발생했습니다: {{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+              - name: 'dev-discord-alerts'
+                discord_configs:
+                  - webhook_url: '${DISCORD_DEFAULT_WEBHOOK_URL}'
+                    title: '⚠️ [{{ .Status | toUpper }}] Dev 환경 장애 발생'
+                    message: 'Dev 알람: {{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+              - name: 'prod-discord-alerts'
+                discord_configs:
+                  - webhook_url: '${DISCORD_DEFAULT_WEBHOOK_URL}'
+                    title: '🚨 [{{ .Status | toUpper }}] Prod 환경 실서비스 장애 발생'
+                    message: '즉각 조치가 필요합니다!\n{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+          extraEnv:
+            - name: DISCORD_DEFAULT_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: alertmanager-env-secrets
+                  key: DISCORD_DEFAULT_WEBHOOK_URL
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
