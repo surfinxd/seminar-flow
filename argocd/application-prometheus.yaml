@@ -30,6 +30,8 @@ spec:
                       description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has CPU usage > 80%."
         alertmanager:
           enabled: true
+          extraArgs:
+            config.expand-env: ""
           config:
             route:
               group_by: ['alertname', 'namespace']
